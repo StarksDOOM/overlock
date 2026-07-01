@@ -24,6 +24,42 @@ Before creating any new GitHub issue on `StarksDOOM/overlock`:
 - Each feature branch maps to exactly one GitHub issue.
 - Commit messages follow conventional commits: `feat:`, `fix:`, `chore:`, `docs:`, `test:`.
 
+## Pull Request Process
+
+### Before Creating a PR
+
+1. **Ensure the branch is up to date.** Rebase or merge `develop` into your feature branch before opening a PR.
+2. **Verify the build passes locally.** Run `npm run build` and `npm test` (where applicable) before pushing.
+3. **Push the feature branch.** `git push origin feature/<short-name>`.
+
+### Creating a PR
+
+1. **Target branch is always `develop`** — never open a PR directly to `master`.
+2. **Title format**: Match the issue title using conventional commit prefix.
+   - Example: `feat: project scaffolding — TypeScript, TSOA config, and dev tooling`
+3. **Body must include**:
+   - `Closes #<issue-number>` to auto-link and auto-close the issue on merge.
+   - A summary of changes made (what was built, what was modified).
+   - Any testing performed or verification steps.
+4. **Check for existing PRs first.** Run `gh pr list --repo StarksDOOM/overlock --state open` to avoid duplicate PRs for the same branch/issue.
+
+### PR Review & Merge
+
+1. **All checks must pass** — CI pipeline (build + tests) must be green before merge.
+2. **Squash merge** into `develop` — keeps commit history clean with one commit per feature.
+3. **Delete the feature branch** after merge — both remote and local.
+   ```bash
+   git push origin --delete feature/<short-name>
+   git branch -d feature/<short-name>
+   ```
+4. **Never force-push to `develop` or `master`.**
+
+### Merging `develop` → `master`
+
+- Only merge `develop` into `master` when a stable release milestone is reached.
+- Use a standard merge commit (not squash) to preserve the full feature history.
+- Tag the merge commit with a semver version: `git tag v0.1.0`.
+
 ## Architecture
 
 - This is an **npm workspaces monorepo** with `backend/` and `frontend/` packages.

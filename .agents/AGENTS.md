@@ -73,3 +73,49 @@ Before creating any new GitHub issue on `StarksDOOM/overlock`:
 - Controllers contain zero business logic — they delegate to services.
 - Database queries use raw SQL with `pg` — no ORM.
 - All domain logic follows the `domains/<name>/` directory structure.
+
+## Testing
+
+### Enforcement
+
+- **No PR merges without green CI.** GitHub Actions must pass all checks before a PR can be merged into `develop`.
+- **Every new service or component must have corresponding tests.** Untested code is not mergeable.
+
+### Backend (`@overlock/backend`)
+
+- **Test runner**: Jest with `ts-jest` preset.
+- **Unit tests**: `backend/tests/**/*.test.ts` — test services and utilities in isolation.
+- **Integration tests**: `backend/tests/**/*.integration.test.ts` — test full request lifecycle against real Postgres + Redis via Docker service containers.
+- **Run locally**:
+  ```bash
+  npm test --workspace=backend                    # unit tests
+  npm run test:integration --workspace=backend    # integration tests (requires Docker)
+  ```
+- **CI pipeline**: GitHub Actions spins up `postgres:16-alpine` and `redis:7-alpine` as service containers, runs migrations, then executes both test suites.
+- **Required coverage**:
+  - All domain services (`allocation.service.ts`, `idempotency.service.ts`, `anomaly.service.ts`) must have tests.
+  - The concurrency proof test (10 concurrent writes via `Promise.all()`) must be present and passing.
+
+### Frontend (`@overlock/frontend`)
+
+- **Test runner**: Jest or Vitest (whichever is configured by Next.js).
+- **Component tests**: `frontend/__tests__/**/*.test.tsx` — test React components and hooks.
+- **Validation tests**: `frontend/__tests__/**/*.test.ts` — test pure logic (e.g., `acid-validator.ts`).
+- **Lint check**: `npm run lint --workspace=frontend` must pass with zero errors.
+- **Run locally**:
+  ```bash
+  npm test --workspace=frontend     # component + logic tests
+  npm run lint --workspace=frontend # ESLint check
+  ```
+- **CI pipeline**: GitHub Actions runs `npm run build --workspace=frontend` (Next.js build catches type errors) and `npm run lint --workspace=frontend`.
+- **Required coverage**:
+  - ACID validator logic (`acid-validator.ts`) must have unit tests for all 7 checks.
+  - API client (`api-client.ts`) must have tests for error handling paths.
+
+### GitHub Actions CI Requirements
+
+- **Trigger on**: `push` to `master` and `develop`, all `pull_request` events.
+- **Both workspaces tested**: CI runs backend and frontend checks in the same workflow (can be parallel jobs).
+- **Service containers**: Postgres 16 + Redis 7 for backend integration tests.
+- **Fail-fast**: If any job fails, the entire workflow fails and the PR is blocked.
+- **Environment variables**: `DATABASE_URL`, `REDIS_URL`, `JWT_SECRET`, `NODE_ENV=test` set in CI.

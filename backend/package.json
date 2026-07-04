@@ -1,0 +1,30 @@
+{
+  "name": "@overlock/backend",
+  "version": "0.1.0",
+  "description": "Production-grade inventory allocation state engine with TSOA, PostgreSQL row-locking, and Redis idempotency",
+  "main": "build/src/server.js",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "build": "tsoa spec-and-routes && tsc",
+    "dev": "concurrently \"nodemon\" \"tsoa spec-and-routes --watch\"",
+    "start": "node build/src/server.js",
+    "tsoa:gen": "tsoa spec-and-routes",
+    "test": "jest --runInBand",
+    "test:integration": "jest --config jest.integration.config.ts --runInBand",
+    "db:migrate": "node build/src/config/migrate.js"
+  },
+  "keywords": [
+    "tsoa",
+    "openapi",
+    "inventory",
+    "allocation",
+    "state-engine",
+    "postgresql",
+    "redis",
+    "idempotency"
+  ],
+  "author": "",
+  "license": "MIT"
+}

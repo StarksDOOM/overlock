@@ -1,30 +1,18 @@
 {
-  "name": "core-state-ledger",
-  "version": "0.1.0",
-  "description": "Production-grade inventory allocation state engine with TSOA, PostgreSQL row-locking, and Redis idempotency",
-  "main": "build/src/server.js",
+  "name": "overlock",
+  "private": true,
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
   "engines": {
     "node": ">=20.0.0"
   },
   "scripts": {
-    "build": "tsoa spec-and-routes && tsc",
-    "dev": "concurrently \"nodemon\" \"tsoa spec-and-routes --watch\"",
-    "start": "node build/src/server.js",
-    "tsoa:gen": "tsoa spec-and-routes",
-    "test": "jest --runInBand",
-    "test:integration": "jest --config jest.integration.config.ts --runInBand",
-    "db:migrate": "node build/src/config/migrate.js"
-  },
-  "keywords": [
-    "tsoa",
-    "openapi",
-    "inventory",
-    "allocation",
-    "state-engine",
-    "postgresql",
-    "redis",
-    "idempotency"
-  ],
-  "author": "",
-  "license": "MIT"
+    "dev": "npm run dev --workspaces --if-present",
+    "build": "npm run build --workspaces --if-present",
+    "test": "npm run test --workspace=backend",
+    "test:integration": "npm run test:integration --workspace=backend",
+    "db:migrate": "npm run db:migrate --workspace=backend"
+  }
 }
